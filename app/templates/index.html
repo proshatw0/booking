@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="../static/image/favicon.svg" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style/index.css">
+    <title>Система бронирования столов</title>
+    <script src="../static/script/index.js" defer></script>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <a href="/">
+                {% include 'image/favicon.svg' %}
+                <h1>BeerFactory Reservations</h1>
+            </a>
+        </header>
+        <div class="post-container">
+            <h2>Параметры бронирования</h2>
+            <form method="POST" action="/reserve">
+                <div>
+                    <label for="people">Количество людей:</label>
+                    <select name="people" id="people" required>
+                        {% for i in range(1, 16) %}
+                            <option value="{{ i }}">{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="date">Дата:</label>
+                    <input type="date" name="date" id="date" required>
+                </div>
+                <div>
+                    <label for="time_start">Время начала:</label>
+                    <select name="time_start" id="time_start" required></select>
+                </div>
+                <div>
+                    <label for="time_end">Время окончания:</label>
+                    <select name="time_end" id="time_end" required></select>
+                </div>
+            </form>
+        </div>
+
+        <div class="zoom-container">
+            <div class="zoom-content">
+                <div class="hall-container">
+                    <!-- Зал 1 -->
+                    <div class="sector" id="hall-1">
+                        <h3>Зал 1</h3>
+                        <div class="zone-1-1">
+                            <div class="table"><button id="table-14">14</button></div>
+                            <div class="table"><button id="table-15">15</button></div>
+                            <div class="table"><button id="table-16">16</button></div>
+                        </div>
+                        <div class="zone-1-2">
+                            <div class="table"><button id="table-13">13</button></div>
+                        </div>
+                        <div class="zone-1-3">
+                            <div class="table"><button id="table-12">12</button></div>
+                        </div>
+                        <div class="zone-1-4">
+                            <div class="table"><button id="table-11">11</button></div>
+                        </div>
+                    </div>
+                
+                    <!-- Зал 2 -->
+                    <div class="sector" id="hall-2">
+                        <h3>Зал 2</h3>
+                        <div class="zone-2-1">
+                            <div class="table"><button id="table-21">21</button></div>
+                            <div class="table"><button id="table-22">22</button></div>
+                        </div>
+                        <div class="zone-2-2">
+                            <div class="table"><button id="table-24">24</button></div>
+                            <div class="table"><button id="table-23">23</button></div>
+                        </div>
+                    </div>
+                
+                    <!-- Зал 3 -->
+                    <div class="sector" id="hall-3">
+                        <h3>Зал 3</h3>
+                        <div class="zone-3-1">
+                            <div class="table"><button id="table-31">31</button></div>
+                            <div class="table"><button id="table-32">32</button></div>
+                            <div class="table"><button id="table-33">33</button></div>
+                        </div>
+                        <div class="zone-3-2">
+                            <div class="zone-3-2-1">
+                                <div class="table"><button id="table-35">35</button></div>
+                                <div class="table"><button id="table-36">36</button></div>
+                            </div>
+                            <div class="zone-3-2-2">
+                                <div class="table"><button id="table-34">34</button></div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Зал 4 -->
+                    <div class="sector" id="hall-4">
+                        <h3>Зал 4</h3>
+                        <div class="zone-4-1">
+                            <div class="table"><button id="table-41">41</button></div>
+                            <div class="table"><button id="table-42">42</button></div>
+                            <div class="table"><button id="table-43">43</button></div>
+                        </div>
+                        <div class="zone-4-2">
+                            <div class="zone-4-2-1">
+                                <div class="table"><button id="table-49">49</button></div>
+                                <div class="table"><button id="table-48">48</button></div>
+                                <div class="table"><button id="table-47">47</button></div>
+                            </div>
+                            <div class="zone-4-2-2">
+                                <div class="table"><button id="table-44">44</button></div>
+                                <div class="table"><button id="table-45">45</button></div>
+                                <div class="table"><button id="table-46">46</button></div>
+                            </div>
+                        </div>
+                        <div class="zone-4-3">
+                            <div class="table"><button id="table-40-1">40.1</button></div>
+                            <div class="table"><button id="table-40-2">40.2</button></div>
+                        </div>
+                    </div>
+                
+                    <!-- Зал 5 -->
+                    <div class="sector" id="hall-5">
+                        <h3>Зал 5</h3>
+                        <div class="zone-5-1">
+                            <div class="table"><button id="table-51">51</button></div>
+                            <div class="table"><button id="table-52">52</button></div>
+                            <div class="table"><button id="table-53">53</button></div>
+                        </div>
+                        <div class="zone-5-2">
+                            <div class="zone-5-2-1">
+                                <div class="table"><button id="table-59">59</button></div>
+                                <div class="table"><button id="table-58">58</button></div>
+                                <div class="table"><button id="table-57">57</button></div>
+                            </div>
+                            <div class="zone-5-2-2">
+                                <div class="table"><button id="table-54">54</button></div>
+                                <div class="table"><button id="table-55">55</button></div>
+                                <div class="table"><button id="table-56">56</button></div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Зал 6 -->
+                    <div class="sector" id="hall-6">
+                        <h3>Зал 6</h3>
+                        <div class="zone-6-1">
+                            <div class="table"><button id="table-61">61</button></div>
+                            <div class="table"><button id="table-62">62</button></div>
+                        </div>
+                        <div class="zone-6-2">
+                            <div class="table"><button id="table-68">68</button></div>
+                            <div class="table"><button id="table-63">63</button></div>
+                        </div>
+                        <div class="zone-1-3">
+                            <div class="table"><button id="table-67">67</button></div>
+                            <div class="table"><button id="table-64">64</button></div>
+                        </div>
+                        <div class="zone-6-4">
+                            <div class="table"><button id="table-66">66</button></div>
+                            <div class="table"><button id="table-65">65</button></div>
+                        </div>
+                    </div>
+                
+                    <!-- Зал 7 -->
+                    <div class="sector" id="hall-7">
+                        <h3>Зал 7</h3>
+                        <div class="zone-7-1">
+                            <div class="table"><button id="table-71">71</button></div>
+                            <div class="table"><button id="table-72">72</button></div>
+                            <div class="table"><button id="table-73">73</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="table-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Стол</h2>
+                <button type="button" id="close-table-modal-btn" class="close-btn">&times;</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="reserve-modal-overlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Детали бронирования</h2>
+                <button type="button" id="close-reserve-modal-btn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="data-reserve-user"></p>
+                <p id="table-reserve-user"></p>
+                <p>BeerFactory, Красный проспект 22</p>
+                <div class="time-reserv-comtaner">
+                    <p id="time-reserve-user"></p>
+                </div>
+                <p>Контактная информация</p>
+                <form class="reservation-form">
+                    <div class="form-field">
+                        <label for="name" class="form-label">Имя</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+    
+                    <div class="form-field">
+                        <label for="phone" class="form-label">Телефон</label>
+                        <input type="text" id="phone" name="phone" required>
+                    </div>
+    
+                    <div class="form-field">
+                        <label for="email" class="form-label">Почта</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+    
+                    <div class="form-field">
+                        <label for="specialRequests" class="form-label">Особые пожелания</label>
+                        <input type="text" id="specialRequests" name="specialRequests">
+                    </div>
+                    <div class="form-field">
+                        <button type="button" id="submit-reservation-btn">Забронировать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</body>
+</html>

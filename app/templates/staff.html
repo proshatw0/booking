@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="../../static/image/favicon.svg" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../static/style/staff.css">
+    <script src="../../static/script/staff.js" defer></script>
+    <title>Настройки сотрудников</title>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <a href="/brewmaster-secret/panel/">
+                {% include 'image/favicon.svg' %}
+                <h1>BeerFactory Reservations Admin</h1>
+            </a>
+        </header>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <div class="staff-area">
+            <div class="staff-header">
+                <h2>Настройки сотрудников</h2>
+                <button id="open-modal-btn">Добавить</button>
+            </div>
+            <div class="staff-table">
+                {% for user in staff_users %}
+                <div class="staff-entry">
+                    <div class="staff-info">
+                        {{ user.id }}
+                        {{ user.last_name }}
+                        {{ user.first_name[0] if user.first_name else '' }}
+                        {% if user.middle_name %}
+                            {{ user.middle_name[0] }}.
+                        {% else %}
+                            {{ '' }}
+                        {% endif %}
+                        <span class="staff-role">{{ user.position.name }}</span>
+                    </div>
+        
+                    <div class="staff-actions">
+                        <button type="button" class="edit-btn" data-user-id="{{ user.id }}">Изменить</button>
+        
+                            <button type="button" class="delete-btn"
+                                    data-user-id="{{ user.id }}"
+                                    data-user-name="{{ user.last_name }} {{ user.first_name[0] }}. {{ user.middle_name[0] if user.middle_name else '' }}">
+                                Удалить
+                            </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="modal-overlay" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Добавить сотрудника</h2>
+                    <button type="button" id="close-modal-btn" class="close-btn">&times;</button>
+                </div>
+                <form method="POST" action="{{ url_for('main.add_user') }}">
+                    <label for="last_name">Фамилия</label>
+                    <input type="text" name="last_name" required>
+        
+                    <label for="first_name">Имя</label>
+                    <input type="text" name="first_name" required>
+        
+                    <label for="middle_name">Отчество</label>
+                    <input type="text" name="middle_name">
+        
+                    <label for="login">Логин</label>
+                    <input type="text" name="login" required>
+        
+                    <label for="password">Пароль</label>
+                    <input type="password" name="password" required>
+        
+                    <label for="position_id">Должность</label>
+                    <select name="position_id" required>
+                        {% for position in positions %}
+                            <option value="{{ position.id }}">{{ position.name }}</option>
+                        {% endfor %}
+                    </select>
+        
+                    <div class="modal-content-button">
+                        <button type="submit">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div id="edit-modal-overlay" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Редактировать сотрудника</h2>
+                    <button type="button" id="close-edit-modal-btn" class="close-btn">&times;</button>
+                </div>
+                <form method="POST" action="{{ url_for('main.update_user') }}">
+                    <input type="hidden" name="user_id" id="user_id_edit">
+                    
+                    <label for="last_name_edit">Фамилия</label>
+                    <input type="text" name="last_name_edit" required>
+        
+                    <label for="first_name_edit">Имя</label>
+                    <input type="text" name="first_name_edit" required>
+        
+                    <label for="middle_name_edit">Отчество</label>
+                    <input type="text" name="middle_name_edit">
+        
+                    <label for="login_edit">Логин</label>
+                    <input type="text" name="login_edit" disabled>
+        
+                    <label for="position_id_edit">Должность</label>
+                    <select name="position_id_edit" required>
+                        {% for position in positions %}
+                            <option value="{{ position.id }}">{{ position.name }}</option>
+                        {% endfor %}
+                    </select>
+        
+                    <div class="modal-content-button">
+                        <button type="submit">Сохранить изменения</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    <div id="delete-modal-overlay" class="modal-overlay">
+        <div class="modal-content-remove">
+            <h2>Подтвердить удаление</h2>
+            <p id="delete-confirm-text"></p>
+            <div class="modal-buttons">
+                <button type="button" id="delete-confirm-btn">Да</button>
+                <button type="button" id="delete-cancel-btn">Нет</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

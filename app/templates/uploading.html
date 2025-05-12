@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="../../static/image/favicon.svg" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../static/style/uploading.css">
+    <script src="../../static/script/uploading.js" defer></script>
+    <title>Выгрузка броней</title>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <a href="/brewmaster-secret/panel/">
+                {% include 'image/favicon.svg' %}
+                <h1>BeerFactory Reservations Admin</h1>
+            </a>
+        </header>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <div class="uploading-area">
+            <h2>Выгрузить брони</h2>
+            <form action="{{ url_for('main.get_reservations') }}" method="GET">
+                <div>
+                    <label for="start-date">С</label>
+                    <input type="date" id="start-date" name="start_date" required>
+                </div>
+                <div>
+                    <label for="end-date">По</label>
+                    <input type="date" id="end-date" name="end_date" required>
+                </div>
+                <button type="submit">Выгрузить</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>    

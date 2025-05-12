@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Список столов</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .table-item { border: 1px solid #ccc; margin: 10px 0; padding: 10px; border-radius: 8px; }
+        .table-item img { max-width: 200px; max-height: 150px; display: block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Список столов</h1>
+    <a href="{{ url_for('main.add_table') }}">➕ Добавить новый стол</a>
+
+    {% for table in tables %}
+        <div class="table-item">
+            {% if table.photo %}
+                <img src="{{ url_for('static', filename=table.photo.replace('app/static/', '')) }}" alt="Фото стола" style="max-width: 300px; max-height: 300px;">
+            {% endif %}
+            <h2>{{ table.name }}</h2>
+            <p><strong>Описание:</strong> {{ table.description }}</p>
+            <p><strong>Вместимость:</strong> {{ table.capacity }} человек</p>
+            <p><strong>Депозит:</strong> {{ table.deposit }} руб.</p>
+            <a href="{{ url_for('main.edit_table', table_id=table.id) }}">✏️ Редактировать</a>
+        </div>
+    {% endfor %}
+</body>
+</html>

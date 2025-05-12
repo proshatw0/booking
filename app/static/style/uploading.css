@@ -1,0 +1,127 @@
+body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: #D6D6D6;
+    font-family: Arial;
+    margin: 0;
+    align-items: center;
+}
+
+.flash-messages {
+    position: relative;
+    width: 100%;
+}
+
+.flash {
+    background-color: #F5F7FA;
+    font-weight: normal;
+    border-radius: 12px;
+    max-width: 100%;
+}
+.flash p{
+    margin: 0;
+    padding: 12px;
+    font-size: 24px;
+}
+
+.flash.success {
+    color: #4CAF50;
+}
+
+.flash.error {
+    color: #E31A25;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 40px);
+    max-width: 1400px;
+    padding: 20px;
+    gap: 20px;
+    align-items: center;
+}
+
+header {
+    display: flex;
+    width: 100%;
+    background-color: #F5F7FA;
+    height: 80px;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+}
+header a{
+    display: flex;
+    text-decoration: none;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+header svg {
+    height: 60px !important;
+    width: auto !important;
+}
+
+header h1 {
+    font-size: 32px;
+    color: #1E2020;
+    font-weight: normal;
+    margin: 0;
+}
+
+.uploading-area{
+    display: flex;
+    width: 50%;
+    min-width: 300px;
+    background-color: #F5F7FA;
+    padding: 12px 0;
+    border-radius: 12px;
+    align-items: center;
+    flex-direction: column;
+}
+
+.uploading-area h2{
+    font-size: 28px;
+    color: #1E2020;
+    font-weight: normal;
+    margin: 0;
+    margin-bottom: 12px;
+}
+
+.uploading-area form{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.uploading-area form label{
+    font-size: 20px;
+    color: #1E2020;
+}
+
+.uploading-area form input{
+    font-size: 20px;
+    font-weight: normal;
+    color: #1E2020;
+    border-radius: 8px;
+    border: 2px #D6D6D6 solid;
+    padding: 4px 8px;
+}
+
+.uploading-area form button{
+    background-color: #4750FB;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    color: #F5F7FA;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+}
+
+.uploading-area form button:hover{
+    background-color: #3d44d5;
+}

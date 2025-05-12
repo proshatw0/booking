@@ -1,0 +1,346 @@
+body {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color: #D6D6D6;
+    font-family: Arial;
+    margin: 0;
+    align-items: center;
+}
+
+.flash-messages {
+    position: relative;
+    width: 100%;
+}
+
+.flash {
+    background-color: #F5F7FA;
+    font-weight: normal;
+    border-radius: 12px;
+    max-width: 100%;
+}
+.flash p{
+    margin: 0;
+    padding: 12px;
+    font-size: 24px;
+}
+
+.flash.success {
+    color: #4CAF50;
+}
+
+.flash.error {
+    color: #E31A25;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    width: calc(100% - 40px);
+    max-width: 1400px;
+    padding: 20px;
+    gap: 20px;
+}
+
+header {
+    display: flex;
+    width: 100%;
+    background-color: #F5F7FA;
+    height: 80px;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+}
+header a{
+    display: flex;
+    text-decoration: none;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+header svg {
+    height: 60px !important;
+    width: auto !important;
+}
+
+header h1 {
+    font-size: 32px;
+    color: #1E2020;
+    font-weight: normal;
+    margin: 0;
+}
+
+.filter-area{
+    width: 100%;
+    background-color: #F5F7FA;
+    padding: 12px 0;
+    border-radius: 12px;
+}
+
+.filter-header{
+    width: calc(100% - 24px);
+    padding: 12px;
+    padding-top: 0;
+    border-bottom: 2px #D6D6D6 solid;
+}
+
+.filter-header h2{
+    color: #1E2020;
+    font-size: 28px;
+    font-weight: normal;
+    margin: 0;
+}
+
+.filter-data{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.filter-data label{
+    font-size: 20px;
+    color: #1E2020;
+}
+
+.filter-data input{
+    font-size: 20px;
+    color: #1E2020;
+    background-color: #F5F7FA;
+    border-radius: 8px;
+    padding: 4px 8px;
+    border: 2px #D6D6D6 solid;
+}
+
+.filter-data select{
+    font-size: 20px;
+    color: #1E2020;
+    background-color: #F5F7FA;
+    border-radius: 8px;
+    padding: 4px 8px;
+    border: 2px #D6D6D6 solid;
+}
+
+.search-block label{
+    margin-right: 12px;
+}
+
+.filter-data button{
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    background-color: #D6D6D6;
+    color: #1E2020;
+    padding: 4px 8px;
+    transition: all 0.3s ease;
+}
+
+.filter-data button:hover{
+    background-color: #8F8F8F;
+}
+
+form{
+    padding: 12px;
+    padding-bottom: 0;
+}
+
+.reservation-area{
+    width: 100%;
+    background-color: #F5F7FA;
+    padding: 12px 0;
+    border-radius: 12px;
+}
+
+.reservation-header{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 12px;
+    border-bottom: 2px #D6D6D6 solid;
+    margin-bottom: 12px;
+    gap: 24px;
+}
+
+.reservation-header p{
+    padding: 0;
+    margin: 0 0 0 12px;
+    font-size: 20px;
+    color: #1E2020;
+}
+
+.reservation-header button{
+    background-color: #4750FB;
+    color: #F5F7FA;
+    font-size: 20px;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    transition: 0.3s ease all;
+}
+
+.reservation-header button:hover{
+    background-color: #3940cd;
+}
+
+.reservation-table-wrapper{
+    width: calc(100% - 24px);
+    margin: 0 12px;
+    border: 2px #D6D6D6 solid;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 60vh;
+    max-height: 800px;
+    min-height: 200px;
+}
+
+.reservation-table-header{
+    width: 100%;
+    background-color: #D6D6D6;
+    font-size: 20px;
+    color: #1E2020;
+}
+.reservation-data-scroll {
+    overflow-y: auto;
+    max-height: calc(60vh - 40px);
+}
+
+.reservation-table-header th{
+    font-weight: normal;
+}
+.reservation-body{
+    width: 100%;
+    background-color: #F5F7FA;
+    font-size: 20px;
+    color: #1E2020;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.reservation-body td{
+    padding: 12px 0;
+    border: none;
+    border-bottom: 2px solid #D6D6D6;
+}
+
+.clickable-row {
+    cursor: pointer;
+}
+
+.clickable-row:hover td {
+    background-color: #D6D6D6;
+}
+
+.modal-overlay{
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: #F5F7FA;
+    padding: 12px;
+    border-radius: 12px;
+    width: 60%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    position: relative;
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.modal-header h2 {
+    font-size: 28px;
+    color: #1E2020;
+    font-weight: normal;
+    margin: 0;
+}
+
+.close-btn{
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+    padding: 0 8px;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content form label{
+    font-size: 20px;
+    color: #1E2020;
+    margin-bottom: 4px;
+}
+
+.modal-content form input{
+    font-size: 20px;
+    color: #1E2020;
+    margin-bottom: 12px;
+    border: 2px #D6D6D6 solid;
+    background-color: #F5F7FA;
+    border-radius: 8px;
+    padding: 2px 8px;
+}
+
+.modal-content form select{
+    font-size: 20px;
+    color: #1E2020;
+    margin-bottom: 12px;
+    border: 2px #D6D6D6 solid;
+    border-radius: 8px;
+    padding: 2px 8px;
+    background-color: #F5F7FA;
+}
+
+.modal-content-button{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.modal-content form button{
+    padding: 4px 12px;
+    background-color: #4750FB;
+    font-size: 24px;
+    color: #F5F7FA;
+    border: none;
+    border-radius: 8px;
+}
+
+.modal-content form button:hover{
+    background-color: #3940cd;
+}
+
+#remove-reservation-btn{
+    background-color: #E31925;
+}
+
+#remove-reservation-btn:hover{
+    background-color: #b31620;
+}

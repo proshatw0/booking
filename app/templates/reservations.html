@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="../../static/image/favicon.svg" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../static/style/reservations.css">
+    <script src="../../static/script/reservations.js" defer></script>
+    <title>Настройки броней</title>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <a href="/brewmaster-secret/panel/">
+                {% include 'image/favicon.svg' %}
+                <h1>BeerFactory Reservations Admin</h1>
+            </a>
+        </header>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <div class="filter-area">
+            <div class="filter-header">
+                <h2>Настройки отображения</h2>
+            </div>
+            <form method="GET" class="filter-data">
+                <label for="filter-date">Дата</label>
+                <input type="date" id="filter-date" name="filter_date">
+            
+                <div>
+                    <label for="start-time">Время с</label>
+                    <select name="start_time" id="start-time">
+                        <option value="">-- не выбрано --</option>
+                        {% for hour in range(0, 24) %}
+                            {% set time_str = "{:02d}:00".format(hour) %}
+                            <option value="{{ time_str }}">{{ time_str }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="end-time">до</label>
+                    <select name="end_time" id="end-time">
+                        <option value="">-- не выбрано --</option>
+                        {% for hour in range(0, 24) %}
+                            {% set time_str = "{:02d}:00".format(hour) %}
+                            <option value="{{ time_str }}">{{ time_str }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="search-block">
+                    <label for="search-text">Поиск</label>
+                    <input type="text" id="search-text" name="search_query" placeholder="Введите текст...">
+                </div>
+                <div class="filter-buttons">
+                    <button type="button" id="clear-filters-btn">Очистить</button>
+                </div>
+            </form>
+        </div>
+        <div class="reservation-area">
+            <div class="reservation-header">
+                <p>Список броней</p>
+                <button id="open-reservation-modal-btn">Добавить</button>
+            </div>
+            <div class="reservation-table-wrapper">
+                <table class="reservation-table-header">
+                    <colgroup>
+                        <col style="width: 20%;">
+                        <col style="width: 15%;">
+                        <col style="width: 20%;">
+                        <col style="width: 20%;">
+                        <col style="width: 10%;">
+                        <col style="width: 15%;">
+                      </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Статус</th>
+                            <th>Дата</th>
+                            <th>Время</th>
+                            <th>Чел</th>
+                            <th>Стол</th>
+                        </tr>
+                    </thead>
+                </table>
+                <div class="reservation-data-scroll">
+                    <table class="reservation-body">
+                        <colgroup>
+                            <col style="width: 20%;">
+                            <col style="width: 15%;">
+                            <col style="width: 20%;">
+                            <col style="width: 20%;">
+                            <col style="width: 10%;">
+                            <col style="width: 15%;">
+                        </colgroup>
+                        <tbody>
+                            {% for reservation in reservations %}
+                            <tr class="clickable-row" data-id="{{ reservation.id }}">
+                                <td>{{ reservation.name }}</td>
+                                <td>{{ reservation.status.name }}</td>
+                                <td>{{ reservation.date.strftime('%d.%m.%Y') }}</td>
+                                <td>{{ reservation.start_time.strftime('%H:%M') }}–{{ reservation.end_time.strftime('%H:%M') }}</td>
+                                <td>{{ reservation.num_people }}</td>
+                                <td>{{ reservation.table.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="reservation-modal-overlay" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Добавить бронь</h2>
+                    <button type="button" id="close-reservation-modal-btn" class="close-btn">&times;</button>
+                </div>
+                <form method="POST" action="{{ url_for('main.add_reservations') }}">
+                    <label for="name">Имя</label>
+                    <input type="text" name="name" required>
+        
+                    <label for="date">Дата</label>
+                    <input type="date" name="date" required>
+        
+                    <label for="time_from">Время с</label>
+                    <input type="time" name="time_from" required>
+        
+                    <label for="time_to">Время до</label>
+                    <input type="time" name="time_to" required>
+        
+                    <label for="table">Стол</label>
+                    <input type="text" name="table" required>
+        
+                    <label for="people_count">Количество человек</label>
+                    <input type="number" name="people_count" required min="1">
+        
+                    <label for="phone">Телефон</label>
+                    <input type="text" name="phone">
+        
+                    <label for="email">Почта</label>
+                    <input type="email" name="email">
+        
+                    <label for="notes">Особые пожелания</label>
+                    <input type="text" name="notes"></input>
+        
+                    <div class="modal-content-button">
+                        <button type="submit">Добавить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="reservation-modal-overlay-edit" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Редактировать бронь</h2>
+                    <button type="button" id="close-reservation-modal-btn-edit" class="close-btn">&times;</button>
+                </div>
+                <form id="reservation-edit-form" method="POST" action="{{ url_for('main.update_reservation') }}">
+                    <input type="hidden" name="reservation_id" id="reservation-id">
+        
+                    <label for="name">Имя</label>
+                    <input type="text" name="name_edit" id="reservation-name" required>
+        
+                    <label for="date">Дата</label>
+                    <input type="date" name="date_edit" id="reservation-date" required>
+        
+                    <label for="time_from">Время с</label>
+                    <input type="time" name="time_from_edit" id="reservation-start-time" required>
+        
+                    <label for="time_to">Время до</label>
+                    <input type="time" name="time_to_edit" id="reservation-end-time" required>
+        
+                    <label for="table">Стол</label>
+                    <input type="text" name="table_edit" id="reservation-table" required>
+        
+                    <label for="people_count">Количество человек</label>
+                    <input type="number" name="people_count_edit" id="reservation-num-people" required min="1">
+        
+                    <label for="phone">Телефон</label>
+                    <input type="text" name="phone_edit" id="reservation-phone">
+        
+                    <label for="email">Почта</label>
+                    <input type="email" name="email_edit" id="reservation-email">
+        
+                    <label for="notes">Особые пожелания</label>
+                    <input type="text" name="notes_edit" id="reservation-special-requests">
+        
+                    <label for="status_edit">Статус</label>
+                    <select name="status_edit" id="reservation-status" required></select>
+        
+                    <div class="info-block">
+                        <p id="reservation-created-at"></p>
+                        <p id="reservation-responsible"></p>
+                    </div>
+        
+                    <div class="modal-content-button">
+                        <button type="submit">Сохранить</button>
+                        <button type="button" id="remove-reservation-btn">Удалить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

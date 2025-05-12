@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="icon" href="../static/image/favicon.svg" type="image/svg+xml">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style/reservation_thankyou.css">
+    <title>Спасибо за бронь!</title>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <a href="/">
+                {% include 'image/favicon.svg' %}
+                <h1>BeerFactory Reservations</h1>
+            </a>
+        </header>
+        <div class="thankyou-contaner">
+            <div class="thankyou-heder">
+                <h2>Спасибо {{ name }}!</h2>
+                <h2>Стол №{{ table_name }} забронирован!</h2>
+            </div>
+
+            <div class="thankyou-body">
+                <div class="thankyou-data" >
+                    <p class="thankyou-lable">Адрес</p>
+                    <p>BeerFactory, Красный проспект 22</p>
+                </div>
+                <div class="thankyou-data">
+                    <p class="thankyou-lable">Дата </p>
+                    <p>{{ date }}</p>
+                </div>
+                <div class="thankyou-data">
+                    <p class="thankyou-lable">Время</p>
+                    <p>с {{ start_time }} до {{ end_time }}</p>
+                </div>
+                <div class="thankyou-data">
+                    <p class="thankyou-lable">Гостей</p>
+                    <p>{{ num_people }} чел.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
