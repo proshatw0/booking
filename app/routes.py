@@ -229,25 +229,42 @@ def add_reservations():
     try:
         start_time = datetime.strptime(start_time, "%H:%M").time()
         end_time = datetime.strptime(end_time, "%H:%M").time()
-        table_id = int(request.form.get('table'))
+        table_name = request.form.get('table')
     except ValueError:
         flash('Неверный формат данных', 'error')
         return redirect(url_for('main.reservations'))
 
     # Проверяем, существует ли выбранный стол
-    table = Table.query.get(table_id)
+    table = Table.query.filter_by(name=table_name).first()  # Исправление: ищем стол по имени
     if not table:
         flash('Указанный стол не существует', 'error')
+        return redirect(url_for('main.reservations'))
+
+    # Проверяем, существует ли конфликтующее бронирование для выбранного стола
+    conflicting_reservation = Reservation.query.filter(
+        Reservation.table_id == table.id,
+        Reservation.date == date,  # Используем дату, полученную из формы
+        or_(
+            # Проверяем, если время начала новой брони перекрывает старую
+            (Reservation.start_time <= start_time) & (Reservation.end_time > start_time),
+
+            # Проверяем, если время конца новой брони перекрывает старую
+            (Reservation.start_time < end_time) & (Reservation.end_time >= end_time)
+        )
+    ).first()
+
+    if conflicting_reservation:
+        flash('На этот стол уже существует бронирование в выбранное время', 'error')
         return redirect(url_for('main.reservations'))
 
     # Создаем объект бронирования и добавляем его в базу данных
     reservation = Reservation(
         name=name,
-        status_id=1,
+        status_id=1,  # Примерный статус, вы можете изменить его, если необходимо
         date=date,
         start_time=start_time,
         end_time=end_time,
-        table_id=table_id,
+        table_id=table.id,
         num_people=num_people,
         phone=phone,
         email=email,
@@ -278,13 +295,15 @@ def edit_reservation(reservation_id):
     else:
         responsible = None
 
+    table = Table.query.get(reservation.table_id)
+
     return jsonify({
         'id': reservation.id,
         'name': reservation.name,
         'date': reservation.date.strftime('%Y-%m-%d'),
         'start_time': reservation.start_time.strftime('%H:%M'),
         'end_time': reservation.end_time.strftime('%H:%M'),
-        'table_number': reservation.table_id,
+        'table_number': table.name,
         'num_people': reservation.num_people,
         'phone': reservation.phone,
         'email': reservation.email,
@@ -308,9 +327,28 @@ def update_reservation():
     reservation = Reservation.query.get_or_404(reservation_id)
 
     # Обновление информации о бронировании
-    table = Table.query.get(int(request.form['table_edit']))
+    table = Table.query.filter_by(name=request.form['table_edit']).first()
     if not table:
         flash('Указанный стол не существует', 'error')
+        return redirect(url_for('main.reservations'))
+
+     # Проверяем, есть ли уже бронь на этот стол в указанное время
+    conflicting_reservation = Reservation.query.filter(
+        Reservation.table_id == table.id,
+        Reservation.date == datetime.strptime(request.form['date_edit'], "%Y-%m-%d").date(),
+        or_(
+            # Проверяем, если время начала новой брони перекрывает старую
+            (Reservation.start_time <= datetime.strptime(request.form['time_from_edit'], "%H:%M").time()) & 
+            (Reservation.end_time > datetime.strptime(request.form['time_from_edit'], "%H:%M").time()),
+
+            # Проверяем, если время конца новой брони перекрывает старую
+            (Reservation.start_time < datetime.strptime(request.form['time_to_edit'], "%H:%M").time()) & 
+            (Reservation.end_time >= datetime.strptime(request.form['time_to_edit'], "%H:%M").time())
+        )
+    ).first()
+
+    if conflicting_reservation:
+        flash('На этот стол уже существует бронирование в выбранное время', 'error')
         return redirect(url_for('main.reservations'))
 
     try:
@@ -318,7 +356,7 @@ def update_reservation():
         reservation.date = datetime.strptime(request.form['date_edit'], "%Y-%m-%d")
         reservation.start_time = datetime.strptime(request.form['time_from_edit'], "%H:%M").time()
         reservation.end_time = datetime.strptime(request.form['time_to_edit'], "%H:%M").time()
-        reservation.table_id = int(request.form['table_edit'])
+        reservation.table_id = table.id
         reservation.num_people = int(request.form['people_count_edit'])
         reservation.phone = request.form['phone_edit']
         reservation.email = request.form['email_edit']

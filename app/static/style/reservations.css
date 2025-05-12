@@ -50,6 +50,8 @@ header {
     border-radius: 12px;
     align-items: center;
     justify-content: center;
+    align-items: center;
+    justify-content: space-around;
 }
 header a{
     display: flex;
@@ -57,6 +59,20 @@ header a{
     gap: 20px;
     align-items: center;
     justify-content: center;
+}
+
+.logout{
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: normal;
+    background-color: #4750FB;
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    color: #F5F7FA;
+}
+.logout:hover{
+    background-color: #3940cd;
 }
 
 header svg {

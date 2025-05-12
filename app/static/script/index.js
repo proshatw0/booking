@@ -8,17 +8,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const maxEnd = "23:00";
     const stepMinutes = 15;
 
+    // Функция для преобразования времени в минуты
     function timeToMinutes(time) {
         const [h, m] = time.split(":").map(Number);
         return h * 60 + m;
     }
 
+    // Функция для преобразования минут обратно в время
     function minutesToTime(mins) {
         const h = String(Math.floor(mins / 60)).padStart(2, '0');
         const m = String(mins % 60).padStart(2, '0');
         return `${h}:${m}`;
     }
 
+    // Получаем текущее серверное время
     function getNowFromServer() {
         return fetch('/api/time/now')
             .then(response => response.json())
@@ -28,10 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
+    // Округляем время до следующего шага
     function roundToNextStep(minutes, step) {
         return Math.ceil(minutes / step) * step;
     }
 
+    // Устанавливаем минимальное время начала брони для выбранной даты
     function getMinStartTimeForDate(dateStr, nowNSK) {
         const todayStr = nowNSK.toISOString().split('T')[0];
 
@@ -44,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return staticMinStart;
     }
 
+    // Заполнение доступных вариантов для времени начала
     function fillStartOptions(nowNSK) {
         startSelect.innerHTML = '';
         const selectedDate = dateInput.value;
@@ -59,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fillEndOptions(startSelect.value);
     }
 
+    // Заполнение доступных вариантов для времени окончания
     function fillEndOptions(startTime) {
         endSelect.innerHTML = '';
         const start = timeToMinutes(startTime) + 60;
@@ -71,28 +78,43 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Устанавливаем ограничения на выбор даты
     function setupDateLimits(nowNSK) {
-        const minDateStr = nowNSK.toISOString().split('T')[0];
+        const minDate = new Date(nowNSK);
+        minDate.setDate(minDate.getDate()); // Оставляем текущий день
 
+        // Если время больше 21:30, добавляем 1 день
+        const currentTime = nowNSK.getHours() * 60 + nowNSK.getMinutes();
+        if (currentTime > timeToMinutes("21:30")) {
+            minDate.setDate(minDate.getDate() + 1); // Переходим на следующий день
+        }
+
+        const minDateStr = minDate.toISOString().split('T')[0];
+        
+        // Устанавливаем минимальную и максимальную дату
         const maxDate = new Date(nowNSK);
-        maxDate.setDate(maxDate.getDate() + 30);
+        maxDate.setDate(maxDate.getDate() + 30); // Максимум 30 дней вперед
         const maxDateStr = maxDate.toISOString().split('T')[0];
 
         dateInput.min = minDateStr;
         dateInput.max = maxDateStr;
-        dateInput.value = minDateStr;
+
+        dateInput.value = minDateStr;  // Устанавливаем минимальную дату как выбранную
     }
 
+    // Получаем текущее время с сервера и выполняем необходимые действия
     getNowFromServer().then(nowNSK => {
         setupDateLimits(nowNSK);
         fillStartOptions(nowNSK);
 
+        // Добавляем обработчики для обновления времени начала и окончания
         dateInput.addEventListener('change', () => fillStartOptions(nowNSK));
         startSelect.addEventListener('change', () => fillEndOptions(startSelect.value));
 
-        fetchAvailableTables();
+        fetchAvailableTables();  // Обновляем доступные столы
     });
 
+    // Получаем доступные столы для бронирования
     function fetchAvailableTables() {
         const date = dateInput.value;
         const timeStart = startSelect.value;
@@ -139,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('change', fetchAvailableTables);
     });
 });
+
 
 const container = document.querySelector('.zoom-container');
 const content = document.querySelector('.zoom-content');

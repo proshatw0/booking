@@ -15,6 +15,9 @@
                 {% include 'image/favicon.svg' %}
                 <h1>BeerFactory Reservations Admin</h1>
             </a>
+            <div>
+                <a class="logout" href="/brewmaster-secret/logout">Выйти</a>
+            </div>
         </header>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

@@ -92,7 +92,7 @@ header h1 {
 
 .zoom-container {
     width: 100%;
-    height: 45vh;
+    height: calc(100vh - 270px);
     overflow: hidden;
     touch-action: none;
     position: relative;
@@ -148,17 +148,30 @@ header h1 {
 .zone-1-1{
     display: flex;
     gap: 5px;
-    margin-bottom: 120px;
+    margin-bottom: 90px;
+}
+
+.bar{
+    border-radius: 8px;
+    padding: 8px;
+    width: 70px;
+    height: 180px;
+    background-color: #D6D6D6;
+    color: #1E2020;
+    font-size: 24px;
 }
 
 .zone-1-2{
-    margin-bottom: 120px;
+    margin-bottom: 90px;
+    display: flex;
+    justify-content: space-between;
 }
 .zone-1-4{
     margin-left: 70px;
 }
 
 #table-13{
+    margin-top: 40px;
     width: 90px;
     height: 120px;
 }
@@ -277,8 +290,13 @@ header h1 {
     width: 80px;
 }
 
-.zone-6-1{
+.zone-6-1,
+.zone-6-2,
+.zone-6-3,
+.zone-6-4,
+.zone-6-5{
     margin-bottom: 60px;
+    display: flex;
 }
 
 #table-61,
@@ -295,6 +313,19 @@ header h1 {
 .zone-7-1{
     display: flex;
     gap: 5px;
+    margin-bottom: 70px;
+}
+
+.kitchen{
+    text-align: center;
+    font-size: 24px;
+    border-radius: 8px;
+    padding: 8px;
+    background-color: #D6D6D6;
+    padding-top: 30px;
+    width: 200px;
+    height: 60px;
+    color: #1E2020;
 }
 
 .modal-overlay{
@@ -416,6 +447,9 @@ input[type="text"], input[type="email"] {
 }
 
 @media (max-width: 480px) {
+    .zoom-container {
+    height: 45vh;
+    }
     header a{
         gap: 10px;
     }

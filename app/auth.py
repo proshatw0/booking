@@ -32,7 +32,7 @@ def login():
             if user.position_id == 1:
                 return redirect(url_for('main.admin_panel'))
             elif user.position_id == 2:
-                return redirect(url_for('main.reservation'))
+                return redirect(url_for('main.reservations'))
 
             flash('Недопустимая роль пользователя', 'error')
             return redirect(url_for('auth.login'))
