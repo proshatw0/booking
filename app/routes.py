@@ -11,30 +11,36 @@ import pytz
 
 main_bp = Blueprint('main', __name__)
 
+# Функция для проверки, что файл имеет допустимое расширение
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
+# Отображение списка столов
 @main_bp.route('/tables', methods=['GET'])
 def list_tables():
     tables = Table.query.order_by(Table.name).all()
     return render_template('tables_list.html', tables=tables)
 
+# Редактирование информации о столе
 @main_bp.route('/edit_table/<int:table_id>', methods=['GET', 'POST'])
 def edit_table(table_id):
     table = Table.query.get_or_404(table_id)
 
+    # Обработка формы редактирования
     if request.method == 'POST':
         table.name = request.form['name']
         table.description = request.form['description']
         table.capacity = request.form['capacity']
         table.deposit = request.form.get('deposit', type=float)
 
+        # Обработка загрузки фото для стола
         file = request.files.get('photo')
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             new_photo_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             file.save(new_photo_path)
 
+            # Удаление старого фото, если оно существует
             if table.photo and os.path.exists(table.photo):
                 os.remove(table.photo)
 
@@ -42,10 +48,11 @@ def edit_table(table_id):
 
         db.session.commit()
         flash('Стол успешно обновлён!', 'success')
-        return redirect(url_for('main.list_tables'))
+        return redirect(url_for('main.list_tables')) # Перенаправление на список столов
 
-    return render_template('edit_table.html', table=table)
+    return render_template('edit_table.html', table=table) # Отображение формы редактирования
 
+# Добавление нового стола
 @main_bp.route('/add_table', methods=['GET', 'POST'])
 def add_table():
     if request.method == 'POST':
@@ -54,6 +61,7 @@ def add_table():
         capacity = request.form['capacity']
         deposit = request.form.get('deposit', type=float)
 
+        # Загрузка фотографии стола
         photo_path = None
         file = request.files.get('photo')
         if file and allowed_file(file.filename):
@@ -61,6 +69,7 @@ def add_table():
             photo_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
             file.save(photo_path)
 
+        # Создание нового стола
         new_table = Table(name=name, description=description, capacity=capacity, deposit=deposit, photo=photo_path)
         db.session.add(new_table)
         db.session.commit()
@@ -71,45 +80,50 @@ def add_table():
     return render_template('add_table.html')
 
 
-
+# Админская панель
 @main_bp.route('/brewmaster-secret/panel/')
 def admin_panel():
-    admin_id = session.get('admin_user_id')
+    admin_id = session.get('admin_user_id') # Получаем ID администратора из сессии
     if not admin_id:
         flash('Пожалуйста, войдите в систему', 'warning')
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.login')) # Перенаправление на страницу логина
 
-    user = AdminUser.query.get(admin_id)
+    user = AdminUser.query.get(admin_id) # Получаем пользователя по ID
     if not user:
-        session.pop('admin_user_id', None)
+        session.pop('admin_user_id', None)  # Удаляем сессию, если пользователя нет
         flash('Ваша учётная запись была удалена. Войдите снова.', 'warning')
         return redirect(url_for('auth.login'))
 
+
+    # Проверка роли пользователя (если это не админ, перенаправляем)
     if user.position_id == 2:
         return redirect(url_for('main.reservations'))
 
     return render_template('panel.html')
 
+# Страница с сотрудниками
 @main_bp.route('/brewmaster-secret/staff/')
 def admin_staff():
-    admin_id = session.get('admin_user_id')
+    admin_id = session.get('admin_user_id') # Проверка сессии администратора
     if not admin_id:
         flash('Пожалуйста, войдите в систему', 'warning')
         return redirect(url_for('auth.login'))
 
-    user = AdminUser.query.get(admin_id)
+    user = AdminUser.query.get(admin_id) # Получение информации о текущем пользователе
     if not user:
         session.pop('admin_user_id', None)
         flash('Ваша учётная запись была удалена. Войдите снова.', 'warning')
         return redirect(url_for('auth.login'))
 
+    # Если это не админ, перенаправляем
     if user.position_id == 2:
         return redirect(url_for('main.reservations'))
 
     staff_users = AdminUser.query.all()
     positions = Position.query.all()
-    return render_template('staff.html', staff_users=staff_users, positions=positions)
+    return render_template('staff.html', staff_users=staff_users, positions=positions) # Отображение страницы сотрудников
 
+# Страница бронирований
 @main_bp.route('/brewmaster-secret/reservations/')
 def reservations():
     admin_id = session.get('admin_user_id')
@@ -124,7 +138,7 @@ def reservations():
         return redirect(url_for('auth.login'))
 
     reservations = Reservation.query.order_by(Reservation.date.asc(), Reservation.start_time.asc()).all()
-    return render_template('reservations.html', reservations=reservations)
+    return render_template('reservations.html', reservations=reservations)  # Отображение бронирований
 
 @main_bp.route('/brewmaster-secret/reservations/filter')
 def filter_reservations():
@@ -132,19 +146,19 @@ def filter_reservations():
     if not admin_id:
         return jsonify({'error': 'Unauthorized'}), 401
 
-    date = request.args.get('filter_date')
-    start_time = request.args.get('start_time')
-    end_time = request.args.get('end_time')
-    search_query = request.args.get('search_query')
+    date = request.args.get('filter_date') # Дата фильтрации
+    start_time = request.args.get('start_time') # Время начала
+    end_time = request.args.get('end_time') # Время конца
+    search_query = request.args.get('search_query') # Строка поиска
 
-    query = Reservation.query.join(Table)
+    query = Reservation.query.join(Table) # Начинаем запрос на бронирования и столы
 
     if date:
         try:
             date_obj = datetime.strptime(date, "%Y-%m-%d").date()
             query = query.filter(Reservation.date == date_obj)
         except ValueError:
-            pass
+            pass # Если дата некорректна, пропускаем
 
     if start_time:
         try:
@@ -170,8 +184,9 @@ def filter_reservations():
             )
         )
 
-    reservations = query.order_by(Reservation.date.asc(), Reservation.start_time.asc()).all()
+    reservations = query.order_by(Reservation.date.asc(), Reservation.start_time.asc()).all() # Получаем результаты с фильтрами
 
+    # Формируем и возвращаем результат в формате JSON
     return jsonify([
         {
             'id': r.id,
@@ -186,6 +201,7 @@ def filter_reservations():
         for r in reservations
     ])
 
+# Роут для добавления нового бронирования с админки
 @main_bp.route('/brewmaster-secret/reservations/add', methods=['POST'])
 def add_reservations():
     admin_id = session.get('admin_user_id')
@@ -193,6 +209,7 @@ def add_reservations():
         flash('Пожалуйста, войдите в систему', 'warning')
         return redirect(url_for('auth.login'))
 
+    # Получаем данные из формы
     name = request.form.get('name')
     date = request.form.get('date')
     start_time = request.form.get('time_from')
@@ -202,6 +219,7 @@ def add_reservations():
     email = request.form.get('email')
     special_requests = request.form.get('notes')
 
+    # Обрабатываем дату и время
     try:
         date = datetime.strptime(date, "%Y-%m-%d") 
     except ValueError:
@@ -216,11 +234,13 @@ def add_reservations():
         flash('Неверный формат данных', 'error')
         return redirect(url_for('main.reservations'))
 
+    # Проверяем, существует ли выбранный стол
     table = Table.query.get(table_id)
     if not table:
         flash('Указанный стол не существует', 'error')
         return redirect(url_for('main.reservations'))
 
+    # Создаем объект бронирования и добавляем его в базу данных
     reservation = Reservation(
         name=name,
         status_id=1,
@@ -241,6 +261,7 @@ def add_reservations():
     flash('Бронь успешно добавлена', 'success')
     return redirect(url_for('main.reservations'))
 
+# Роут для редактирования бронирования
 @main_bp.route('/brewmaster-secret/reservations/edit/<int:reservation_id>', methods=['GET'])
 def edit_reservation(reservation_id):
     admin_id = session.get('admin_user_id')
@@ -248,8 +269,8 @@ def edit_reservation(reservation_id):
         flash('Пожалуйста, войдите в систему', 'warning')
         return redirect(url_for('auth.login'))
 
-    reservation = Reservation.query.get_or_404(reservation_id)
-    statuses = Status.query.all()
+    reservation = Reservation.query.get_or_404(reservation_id) # Получаем информацию о бронировании
+    statuses = Status.query.all() # Список всех статусов
 
     admin_user = reservation.admin_user
     if admin_user:
@@ -275,6 +296,7 @@ def edit_reservation(reservation_id):
         'statuses': [{'id': s.id, 'name': s.name} for s in statuses]
     })
 
+# Роут для обновления бронирования
 @main_bp.route('/brewmaster-secret/reservations/update', methods=['POST'])
 def update_reservation():
     admin_id = session.get('admin_user_id')
@@ -285,6 +307,7 @@ def update_reservation():
     reservation_id = request.form.get('reservation_id')
     reservation = Reservation.query.get_or_404(reservation_id)
 
+    # Обновление информации о бронировании
     table = Table.query.get(int(request.form['table_edit']))
     if not table:
         flash('Указанный стол не существует', 'error')
@@ -310,6 +333,7 @@ def update_reservation():
 
     return redirect(url_for('main.reservations'))
 
+# Роут для удаления бронирования
 @main_bp.route('/brewmaster-secret/reservations/remove/<int:reservation_id>', methods=['POST'])
 def remove_reservation(reservation_id):
     admin_id = session.get('admin_user_id')
@@ -320,7 +344,7 @@ def remove_reservation(reservation_id):
     reservation = Reservation.query.get_or_404(reservation_id)
 
     try:
-        db.session.delete(reservation)
+        db.session.delete(reservation) # Удаление бронирования
         db.session.commit()
         flash('Бронь успешно удалена', 'success')
     except Exception as e:
@@ -329,7 +353,7 @@ def remove_reservation(reservation_id):
 
     return redirect(url_for('main.reservations'))
 
-
+# Роут для выгрузки таблиц (внешний вид)
 @main_bp.route('/brewmaster-secret/uploading/')
 def uploading():
     admin_id = session.get('admin_user_id')
@@ -350,6 +374,7 @@ def uploading():
 
     return render_template('uploading.html')
 
+# Роут для выгрузки данных о бронированиях в определённом интервале
 @main_bp.route('/brewmaster-secret/uploading/get')
 def get_reservations():
     admin_id = session.get('admin_user_id')
@@ -363,6 +388,7 @@ def get_reservations():
         flash('Ваша учётная запись была удалена. Войдите снова.', 'warning')
         return redirect(url_for('auth.login'))
 
+    # Преобразование дат
     start_date_str = request.args.get('start_date')
     end_date_str = request.args.get('end_date')
 
@@ -373,11 +399,13 @@ def get_reservations():
         flash('Неверный формат даты', 'danger')
         return redirect(url_for('main.uploading'))
 
+    # Получение списка бронирований
     reservations = Reservation.query.filter(
         Reservation.date >= start_date,
         Reservation.date <= end_date
     ).order_by(Reservation.date, Reservation.start_time).all()
 
+    # Составление списка с данными для экспорта в Excel
     data = []
     for r in reservations:
         admin_user = r.admin_user
@@ -407,9 +435,8 @@ def get_reservations():
             'Ответственный': initials,
         })
 
-
+    # Создание и отправка Excel файла
     df = pd.DataFrame(data)
-
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Reservations')
@@ -425,7 +452,7 @@ def get_reservations():
         download_name=filename
     )
 
-
+# Маршрут для обновления информации о пользователе
 @main_bp.route('/brewmaster-secret/staff/update/', methods=['POST'])
 def update_user():
     admin_id = session.get('admin_user_id')
@@ -442,21 +469,26 @@ def update_user():
     if user.position_id == 2:
         return redirect(url_for('main.reservations'))
 
+    # Получаем ID пользователя, которого нужно обновить
     user_id = request.form['user_id']
     user = AdminUser.query.get_or_404(user_id)
 
+    # Обновление данных пользователя
     user.last_name = request.form['last_name_edit']
     user.first_name = request.form['first_name_edit']
     user.middle_name = request.form['middle_name_edit']
     user.position_id = request.form['position_id_edit']
 
+    # Сохранение изменений в базе данных
     db.session.commit()
 
     flash('Пользователь успешно обновлён', 'success')
     return redirect(url_for('main.admin_staff'))
 
+# Маршрут для удаления пользователя
 @main_bp.route('/brewmaster-secret/staff/delete/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
+    # Проверка авторизации
     admin_id = session.get('admin_user_id')
     if not admin_id:
         flash('Пожалуйста, войдите в систему', 'warning')
@@ -471,16 +503,19 @@ def delete_user(user_id):
     if user.position_id == 2:
         return redirect(url_for('main.reservations'))
 
+    # Получение пользователя, которого нужно удалить
     user_to_delete = AdminUser.query.get(user_id)
 
     if not user_to_delete:
         flash('Пользователь не найден', 'error')
         return redirect(url_for('main.admin_staff'))
 
+    # Нельзя удалить свой собственный аккаунт
     if user_id == admin_id:
         flash('Нельзя удалить свой аккаунт', 'error')
         return redirect(url_for('main.admin_staff'))
 
+    # Удаление пользователя из базы данных
     db.session.delete(user_to_delete)
     db.session.commit()
 
@@ -488,8 +523,10 @@ def delete_user(user_id):
 
     return redirect(url_for('main.admin_staff'))
 
+# Маршрут для добавления нового пользователя
 @main_bp.route('/brewmaster-secret/staff/add/', methods=['POST'])
 def add_user():
+    # Проверка авторизации
     admin_id = session.get('admin_user_id')
     if not admin_id:
         flash('Пожалуйста, войдите в систему', 'warning')
@@ -504,6 +541,7 @@ def add_user():
     if user.position_id == 2:
         return redirect(url_for('main.reservations'))
 
+    # Получение данных нового пользователя из формы
     first_name = request.form['first_name']
     last_name = request.form['last_name']
     middle_name = request.form['middle_name']
@@ -511,9 +549,12 @@ def add_user():
     password = request.form['password']
     position_id = request.form['position_id']
 
+    # Проверка, что логин не существует в базе данных
     if AdminUser.query.filter_by(login=login).first():
         flash('Логин уже существует', 'error')
         return redirect(url_for('main.admin_staff'))
+
+    # Создание нового пользователя  
     new_user = AdminUser(
         first_name=first_name,
         last_name=last_name,
@@ -523,13 +564,14 @@ def add_user():
     )
     new_user.set_password(password)
 
+    # Сохранение нового пользователя в базе данных
     db.session.add(new_user)
     db.session.commit()
 
     flash('Пользователь успешно добавлен', 'success')
     return redirect(url_for('main.admin_staff'))
 
-
+# Маршрут для получения информации о пользователе для редактирования
 @main_bp.route('/brewmaster-secret/staff/edit/<int:user_id>', methods=['GET'])
 def edit_user(user_id):
     admin_id = session.get('admin_user_id')
@@ -546,6 +588,7 @@ def edit_user(user_id):
     if user.position_id == 2:
         return redirect(url_for('main.reservations'))
 
+    # Получение данных пользователя для редактирования
     user = AdminUser.query.get_or_404(user_id)
     if user:
             return jsonify({
@@ -558,13 +601,16 @@ def edit_user(user_id):
             })
     return jsonify({'error': 'Пользователь не найден'}), 404
 
+# Маршрут для получения доступных столов для бронирования
 @main_bp.route('/reservations/get')
 def user_reservations_get():
+    # Получение параметров из запроса
     date_str = request.args.get('date')
     time_start_str = request.args.get('time_start')
     time_end_str = request.args.get('time_end')
     people = int(request.args.get('people', 1))
 
+    # Попытка преобразования строковых данных в объекты даты и времени
     try:
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
         time_start = datetime.strptime(time_start_str, '%H:%M').time()
@@ -572,6 +618,7 @@ def user_reservations_get():
     except Exception as e:
         return jsonify({'error': 'Некорректные параметры'}), 400
 
+    # Поиск занятых столов в указанный период
     busy_reservations = Reservation.query.filter(
         Reservation.date == date,
         or_(
@@ -583,6 +630,7 @@ def user_reservations_get():
 
     busy_table_ids = {res.table_id for res in busy_reservations}
 
+    # Поиск доступных столов
     available_tables = Table.query.filter(
         Table.capacity >= people,
         ~Table.id.in_(busy_table_ids)
@@ -593,6 +641,7 @@ def user_reservations_get():
         for table in available_tables
     ])
 
+# Маршрут для получения информации о столе по имени
 @main_bp.route('/table/<name>')
 def get_table_by_name(name):
     table_name = name.replace('-', '.')
@@ -609,6 +658,7 @@ def get_table_by_name(name):
         'deposit': table.deposit
     })
 
+# Маршрут для получения текущего времени в Новосибирске
 @main_bp.route('/api/time/now')
 def get_nsk_time():
     tz = pytz.timezone('Asia/Novosibirsk')
@@ -618,20 +668,24 @@ def get_nsk_time():
         'time': now.strftime('%H:%M')
     })
 
+# Маршрут для создания нового бронирования для пользователей
 @main_bp.route('/reserve', methods=['POST'])
 def create_reservation():
     data = request.get_json()
 
     try:
+        # Поиск стола по имени
         table = Table.query.filter_by(name=data['table']).first()
         if not table:
             return jsonify({'error': 'Стол не найден'}), 404
 
+        # Преобразование данных даты и времени
         date = datetime.strptime(data['date'], '%Y-%m-%d').date()
         start_time = datetime.strptime(data['time_start'], '%H:%M').time()
         end_time = datetime.strptime(data['time_end'], '%H:%M').time()
         num_people = int(data['people'])
 
+        # Создание нового бронирования
         new_reservation = Reservation(
             name=data['name'],
             status_id=1,
@@ -655,7 +709,7 @@ def create_reservation():
         print('Ошибка при создании бронирования:', e)
         return jsonify({'error': 'Ошибка при создании бронирования'}), 500
 
-
+# Маршрут для получения информации о бронировании
 @main_bp.route('/reservations/<int:reservation_id>')
 def reservation_summary(reservation_id):
     reservation = Reservation.query.get(reservation_id)
@@ -673,7 +727,7 @@ def reservation_summary(reservation_id):
 
     return render_template('reservation_thankyou.html', **data)
 
-
+# Главная страница сайта
 @main_bp.route('/')
 def index():
 

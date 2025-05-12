@@ -92,7 +92,7 @@ header h1 {
 
 .zoom-container {
     width: 100%;
-    height: 50vh;
+    height: 45vh;
     overflow: hidden;
     touch-action: none;
     position: relative;
@@ -317,7 +317,7 @@ header h1 {
     padding: 12px;
     border-radius: 12px;
     width: 60%;
-    max-height: 80vh;
+    max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 }
@@ -413,4 +413,77 @@ input[type="text"], input[type="email"] {
     border-radius: 8px;
     border: 1px solid #ccc;
     font-size: 16px;
+}
+
+@media (max-width: 480px) {
+    header a{
+        gap: 10px;
+    }
+    
+    header svg {
+        height: 40px !important;
+        width: auto !important;
+    }
+    
+    header h1 {
+        font-size: 24px;
+    }
+    
+    .post-container h2{
+        font-size: 20px;
+        margin-bottom: 6px;
+    }
+    
+    .post-container form{
+        gap: 8px;
+    }
+    
+    .post-container form label{
+        font-size: 16px;
+    }
+    
+    .post-container form input{
+        font-size: 16px;
+    }
+    
+    .post-container form select{
+        font-size: 16px;
+    }
+    .modal-content{
+        width: 80%;
+    }
+
+    .modal-header h2 {
+        font-size: 20px;
+    }
+
+    .modal-body p{
+        font-size: 16px;
+    }
+
+    .modal-body input{
+        font-size: 16px;
+        padding: 4px 8px;
+    }
+    
+    .modal-body button{
+        font-size: 16px;
+    }
+    
+    .modal-body p{
+        margin: 0 0 8px 0;
+    }
+    
+    .form-field {
+        margin-bottom: 8px;
+    }
+    
+    .form-field button{
+        font-size: 16px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 5px;
+    }
 }

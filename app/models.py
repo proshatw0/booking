@@ -1,9 +1,31 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# СХЕМА СВЯЗЕЙ МЕЖДУ МОДЕЛЯМИ (ОТНОШЕНИЯ "ОДИН-КО-МНОГИМ"):
+#
+# Position (1) ⇨ (∞) AdminUser
+#   • Один объект Position (должность) может быть у нескольких пользователей.
+#   • Поле: AdminUser.position_id → positions.id
+#
+# AdminUser (1) ⇨ (∞) Reservation
+#   • Один админ может создать множество бронирований (опционально).
+#   • Поле: Reservation.admin_user_id → admin_users.id
+#
+# Status (1) ⇨ (∞) Reservation
+#   • Один статус используется в нескольких бронированиях.
+#   • Поле: Reservation.status_id → statuses.id
+#
+# Table (1) ⇨ (∞) Reservation
+#   • Один стол может быть забронирован много раз.
+#   • Поле: Reservation.table_id → tables.id
+# ─────────────────────────────────────────────────────────────────────────────
+
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from sqlalchemy.orm import relationship
 
 class Table(db.Model):
+    # Модель стола: имя, описание, фото, вместимость, депозит
+    # Используется в бронированиях (связь один-ко-многим)
     __tablename__ = 'tables'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -17,6 +39,8 @@ class Table(db.Model):
         return f'<Table {self.name}>'
 
 class Position(db.Model):
+    # Должности администраторов (например, "Администратор", "Хостес")
+    # Связана с AdminUser через position_id
     __tablename__ = 'positions'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -28,6 +52,9 @@ class Position(db.Model):
         return f'<Position {self.name}>'
 
 class AdminUser(db.Model):
+    # Администратор системы: ФИО, логин, пароль, должность
+    # Может быть автором бронирований (admin_user_id в Reservation)
+    # Использует методы set_password и check_password для хеширования
     __tablename__ = 'admin_users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -48,6 +75,8 @@ class AdminUser(db.Model):
         return f'<AdminUser {self.login}>'
 
 class Status(db.Model):
+    # Статусы бронирования
+    # Связан с Reservation через status_id
     __tablename__ = 'statuses'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -55,6 +84,8 @@ class Status(db.Model):
     reservations = db.relationship('Reservation', backref='status', lazy=True)
 
 class Reservation(db.Model):
+    # Бронирование: имя клиента, статус, дата и время, стол, количество гостей, контакты, примечания
+    # Может быть создано администратором (admin_user_id), связано с Table и Status
     __tablename__ = 'reservations'
 
     id = db.Column(db.Integer, primary_key=True)
